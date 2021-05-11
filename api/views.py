@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from api.utils import validate
+from json import loads
 
 
 class IndexView(View):
@@ -27,8 +28,8 @@ class ApiTestView(View):
     template_name = None
 
     @validate
-    def post(self, request, token):
-        return JsonResponse(request.body)
+    def post(self, request, **kwargs):
+        return JsonResponse(loads(request.body))
 
 
 
