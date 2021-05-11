@@ -11,6 +11,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 
 INSTALLED_APPS = [
+    'corsheaders',
     'api.apps.ApiConfig',
     'common.apps.CommonConfig',
     'django.contrib.admin',
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,3 +93,4 @@ USE_TZ = True
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
+CORS_ORIGIN_ALLOW_ALL = True
