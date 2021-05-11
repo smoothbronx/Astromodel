@@ -11,9 +11,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 
 INSTALLED_APPS = [
-    'corsheaders',
     'api.apps.ApiConfig',
     'common.apps.CommonConfig',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
