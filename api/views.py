@@ -27,7 +27,7 @@ class ApiTestView(View):
     template_name = None
 
     @validate
-    def post(self, request):
+    def post(self, request, token):
         return JsonResponse(request.body)
 
 
