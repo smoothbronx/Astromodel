@@ -1,0 +1,1 @@
+web: gunicorn Astromodel.wsgi --log-file -
