@@ -1,10 +1,12 @@
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from api.utils import validate
 from json import loads
+from api.utils import JSONHandler, KuramotoHandler
 
 
 class IndexView(View):
@@ -14,22 +16,29 @@ class IndexView(View):
         return HttpResponse('Welcome to api home page')
 
 
+@method_decorator(require_POST, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class TradeView(View):
     template_name = ''
 
     @validate
-    def get(self, request, **kwargs):
-        return HttpResponse('Accepted')
+    def post(self, request, **kwargs):
+        return JsonResponse(KuramotoHandler(loads(request.body)).setTime(20).connectHandler(JSONHandler).build(),
+                            json_dumps_params={'indent': 4})
 
 
-@method_decorator(require_POST, name='dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
 class ApiTestView(View):
-    template_name = None
+    template_name = 'api/test.html'
+
+    @validate
+    def get(self, request, **kwargs):
+        return render(request, self.template_name, context={'token': kwargs['token']})
 
     @validate
     def post(self, request, **kwargs):
-        return JsonResponse(loads(request.body))
+        print(request.body)
+        return JsonResponse(loads(request.body), json_dumps_params={'indent': 4})
 
 
 

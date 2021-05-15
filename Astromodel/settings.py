@@ -1,12 +1,18 @@
 from pathlib import Path
 from os.path import join
+from os import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-y*j_0z96$b5sdyj)e_2v(*4%)ja)$&jw)=3g-8q3c3_=q=xq_a'
-API_TOKEN = 'dDha03LqkyCYI6NyRZysPXukX'
 
-DEBUG = True
+try:
+    SECRET_KEY = environ['SECRET_KEY']
+    API_TOKEN = environ['API_TOKEN']
+    DEBUG = bool(int(environ['DEBUG']))
+except KeyError:
+    SECRET_KEY = 'django-insecure-y*j_0z96$b5sdyj)e_2v(*4%)ja)$&jw)=3g-8q3c3_=q=xq_a'
+    API_TOKEN = 'dDha03LqkyCYI6NyRZysPXukX'
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*', ]
 
@@ -77,8 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -93,6 +97,5 @@ USE_TZ = True
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
-
 
 CORS_ALLOW_ALL_ORIGINS = True
