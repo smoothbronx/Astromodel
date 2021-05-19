@@ -23,7 +23,6 @@ class JSONHandler:
             self.matrix = matrix
         if names is not None:
             self.names = names
-
         self.response = defaultdict(dict if dict_type is None else dict_type)
 
     def createDict(self, dd_type=None):
@@ -40,8 +39,8 @@ class JSONHandler:
 
     def collect(self, frames: int):
         positions = [list(self.matrix[object_id, :])[:frames] for object_id in range(len(self.names))]
-        list(map(lambda name: list(
-            map(lambda position: self.response['objects'].__setitem__(name, position), positions)), self.names))
+        list(map(lambda index: self.response['objects'].__setitem__(self.names[index], positions[index]),
+                 (index for index in range(len(self.names)))))
         return self.response
 
 
@@ -51,8 +50,11 @@ class KuramotoHandler:
             self.handler = handler
         if time is not None:
             self.time = time
-        self.data = data
-        self.objects_name = tuple(data['objects'].keys())
+
+        self.fps = data.get('fps', 60)
+        self.oscillators = data.get('objects')
+        self.objects_name = tuple(self.oscillators.keys())
+        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start-angle')), self.objects_name))
 
     def connectHandler(self, handler):
         self.handler = handler
@@ -63,14 +65,15 @@ class KuramotoHandler:
         return self
 
     def build(self):
-        return self.__build(self.data['objects'])
+        return self.__build(self.oscillators)
 
     def __calculate(self, vibration_array: list, fps: int = 60):
         model = Kuramoto(coupling=3, dt=0.01, total_time=self.time, vibration_array=vibration_array)
-        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.objects_name), p=1)))
+        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.oscillators), p=1)),
+                                 angles_vector=self.start_angles)
         return self.handler(matrix=calculations, names=self.objects_name).collect(fps * self.time)
 
     def __build(self, objects):
         vibration_array = [objects[self.objects_name[object_index]]['frequency'] for object_index in
                            range(len(objects))]
-        return self.__calculate(vibration_array=vibration_array, fps=self.data['fps'])
+        return self.__calculate(vibration_array=vibration_array, fps=self.fps)
