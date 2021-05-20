@@ -101,6 +101,7 @@ STATIC_URL = '/static/'
 CORS_ALLOW_HEADERS = (
     'Access-Control-Allow-Headers',
     'Access-Control-Allow-Credentials',
+    'Access-Token',
 )
 
 CORS_ALLOW_ALL_ORIGINS = True
