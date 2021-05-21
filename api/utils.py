@@ -54,7 +54,7 @@ class KuramotoHandler:
         self.fps = data.get('fps', 60)
         self.oscillators = data.get('objects')
         self.objects_name = tuple(self.oscillators.keys())
-        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start-angle')), self.objects_name))
+        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start_angle')), self.objects_name))
 
     def connectHandler(self, handler):
         self.handler = handler
