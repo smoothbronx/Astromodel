@@ -5,3 +5,9 @@ access_denied = {
                 " If you need a token, then inform the administration of the resource.",
     "contact": "xenofium.manager@gmail.com"
 }
+
+oscillators_len = {
+    "code": 500,
+    "error": "Invalid number of oscillators.",
+    "addition": "Perhaps you have indicated less than two oscillators, please indicate more."
+}
