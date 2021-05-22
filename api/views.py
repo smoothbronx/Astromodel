@@ -23,7 +23,7 @@ class TradeView(View):
 
     @validate
     def post(self, request, **kwargs):
-        return JsonResponse(KuramotoHandler(loads(request.body)).setTime(20).connectHandler(JSONHandler).build(),
+        return JsonResponse(KuramotoHandler(loads(request.body)).connectHandler(JSONHandler).build(),
                             json_dumps_params={'indent': 4})
 
 

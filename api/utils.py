@@ -41,16 +41,16 @@ class JSONHandler:
         positions = [list(self.matrix[object_id, :])[:frames] for object_id in range(len(self.names))]
         list(map(lambda index: self.response['objects'].__setitem__(self.names[index], positions[index]),
                  (index for index in range(len(self.names)))))
+        self.response['frames'] = frames
         return self.response
 
 
 class KuramotoHandler:
-    def __init__(self, data: dict, handler=None, time=None):
+    def __init__(self, data: dict, handler=None):
         if handler is not None:
             self.handler = handler
-        if time is not None:
-            self.time = time
 
+        self.time = data.get('time', 20)
         self.fps = data.get('fps', 60)
         self.oscillators = data.get('objects')
         self.objects_name = tuple(self.oscillators.keys())
@@ -60,16 +60,12 @@ class KuramotoHandler:
         self.handler = handler
         return self
 
-    def setTime(self, time):
-        self.time = time
-        return self
-
     def build(self):
         return self.__build(self.oscillators)
 
     def __calculate(self, vibration_array: list, fps: int = 60):
         model = Kuramoto(coupling=3, dt=0.01, total_time=self.time, vibration_array=vibration_array)
-        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.oscillators), p=1)),
+        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=self.oscillators.__len__, p=self.oscillators.__len__)),
                                  angles_vector=self.start_angles)
         return self.handler(matrix=calculations, names=self.objects_name).collect(fps * self.time)
 
