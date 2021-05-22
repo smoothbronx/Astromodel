@@ -32,7 +32,7 @@ def unweighted(func):
 def oscillators_count(count):
     def pre_wrapper(func):
         def wrapper(*args, **kwargs):
-            return func(*args, **kwargs) if loads(args[-1].body)['objects'].__len__() > count \
+            return func(*args, **kwargs) if loads(args[-1].body)['objects'].__len__() >= count \
                 else JsonResponse(oscillators_len, status=500, json_dumps_params={'indent': 4})
         return wrapper
     return pre_wrapper
