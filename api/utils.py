@@ -11,7 +11,7 @@ def validate(function):
     def wrapper(*args, **kwargs):
         return JsonResponse(access_denied, status=403, json_dumps_params={'indent': 4}) \
             if not (any(list(map(lambda data: data == settings.API_TOKEN,
-                                 [args[-1].headers.get('Access-Token', None),
+                                 [args[-1].headers.get('access-token', None),
                                   kwargs.get('token', None)])))) else function(*args, **kwargs)
     return wrapper
 
@@ -54,7 +54,7 @@ class KuramotoHandler:
         self.fps = data.get('fps', 60)
         self.oscillators = data.get('objects')
         self.objects_name = tuple(self.oscillators.keys())
-        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start-angle')), self.objects_name))
+        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start_angle')), self.objects_name))
 
     def connectHandler(self, handler):
         self.handler = handler

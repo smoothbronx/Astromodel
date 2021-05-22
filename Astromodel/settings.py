@@ -1,6 +1,7 @@
 from pathlib import Path
 from os.path import join
 from os import environ
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -98,9 +99,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-CORS_ALLOW_HEADERS = (
+CORS_ALLOW_HEADERS = list(default_headers) + [
     'Access-Control-Allow-Headers',
     'Access-Control-Allow-Credentials',
-)
+    'Access-Token',
+    'access-token'
+]
 
 CORS_ALLOW_ALL_ORIGINS = True
