@@ -54,7 +54,7 @@ class KuramotoHandler:
         self.fps = data.get('fps', 60)
         self.oscillators = data.get('objects')
         self.objects_name = tuple(self.oscillators.keys())
-        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start_angle')), self.objects_name))
+        self.start_angles = list(map(lambda name: float(self.oscillators[f'{name}'].get('start_angle', 0)), self.objects_name))
 
     def connectHandler(self, handler):
         self.handler = handler
@@ -65,7 +65,7 @@ class KuramotoHandler:
 
     def __calculate(self, vibration_array: list, fps: int = 60):
         model = Kuramoto(coupling=3, dt=0.01, total_time=self.time, vibration_array=vibration_array)
-        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=self.oscillators.__len__, p=self.oscillators.__len__)),
+        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.oscillators), p=len(self.oscillators))),
                                  angles_vector=self.start_angles)
         return self.handler(matrix=calculations, names=self.objects_name).collect(fps * self.time)
 
