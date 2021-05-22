@@ -65,7 +65,7 @@ class KuramotoHandler:
 
     def __calculate(self, vibration_array: list, fps: int = 60):
         model = Kuramoto(coupling=3, dt=0.01, total_time=self.time, vibration_array=vibration_array)
-        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.oscillators), p=len(self.oscillators))),
+        calculations = model.run(connectivity_matrix=to_array(to_binomial(n=len(self.oscillators), p=1)),
                                  angles_vector=self.start_angles)
         return self.handler(matrix=calculations, names=self.objects_name).collect(fps * self.time)
 
