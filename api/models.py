@@ -25,7 +25,7 @@ class Kuramoto:
         assert len(angles_vector) == len(self.natfreqs) == len(
             connectivity_matrix), 'Input dimensions do not match, check lengths'
         angles_i, angles_j = meshgrid(angles_vector, angles_vector)
-        dxdt = self.natfreqs + self.coupling / connectivity_matrix.sum(axis=0) * (sin(angles_j - angles_i)).sum(axis=0)
+        dxdt = self.natfreqs + self.coupling / connectivity_matrix.sum(axis=0) * (connectivity_matrix * sin(angles_j - angles_i)).sum(axis=0)
         return dxdt
 
     def integrate(self, angles_vector, connectivity_matrix):
