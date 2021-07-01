@@ -1,17 +1,32 @@
+#region Inputs
 from django.conf import settings
 from django.http import JsonResponse
 import networkx as nx
+from numba.cuda.errors import normalize_kernel_dimensions
 import numpy as np
 from functools import wraps
 import warnings
-from json import loads
-from api.responses import access_denied, oscillators_len
-import scipy.integrate as it
-from typing import Any
+from api.responses import access_denied
+from scipy.integrate import odeint
 from collections import defaultdict
+#endregion Inputs
 
+#region Exception
 
-# DECORATORS
+class DataLengthException(Exception):
+    def __init__(self, message: str):
+        self.__message = message
+
+    def raise_this(self):
+        raise self
+
+    def __repr__(self):
+        return self.__message
+
+#endregion Exception
+
+#region Decorators
+
 def validate(function):
     def wrapper(*args, **kwargs):
         return JsonResponse(access_denied, status=403, json_dumps_params={'indent': 4}) \
@@ -20,23 +35,12 @@ def validate(function):
                                   kwargs.get('token', None)])))) else function(*args, **kwargs)
     return wrapper
 
-
 def unweighted(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         args = [ensure_unweighted(arg) if issubclass(arg.__class__, nx.Graph) else arg for arg in args]
         return func(*args, **kwargs)
     return wrapper
-
-
-def oscillators_count(count):
-    def pre_wrapper(func):
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs) if loads(args[-1].body)['objects'].__len__() >= count \
-                else JsonResponse(oscillators_len, status=500, json_dumps_params={'indent': 4})
-        return wrapper
-    return pre_wrapper
-
 
 def ensure_unweighted(graph):
     for _, _, attr in graph.edges(data=True):
@@ -48,11 +52,11 @@ def ensure_unweighted(graph):
             return new_graph
     return graph
 
+#endregion decorators
 
-# MODELS
+#region Models
+
 class Kuramoto:
-    __results = defaultdict(dict)
-
     @unweighted
     def __init__(self, graph, time: int = 20, dt: float = 0.01, connectivity=None, phases=None, frequencies=None):
         self.graph = graph
@@ -75,45 +79,25 @@ class Kuramoto:
             if frequencies is not None else np.random.uniform(0.9, 1.1, self.nodes_count)
 
     def simulate(self):
-        ts_wrapper = it.odeint(self.theta, self.null_theta, self.time, args=(self.connectivity, self.omega, self.graph_array))
-        ts = np.flipud(ts_wrapper.T) % (2 * np.pi)
-
-        self.__results["internal_frequencies"] = self.omega
-        self.__results["ground_truth"] = self.graph
-        self.__results["TS"] = ts
-        return ts
-
-    def getResults(self):
-        return self.__results
-
-    def __set_res(self, path: str, obj: Any):
-        return self.__results.__setitem__(path, obj)
+        wrapper = odeint(self.theta, self.null_theta, self.time, (self.connectivity, self.omega, self.graph_array))
+        return np.flipud(wrapper.T) % (2 * np.pi)
 
     def theta(self, null_theta, time, connectivity, omega, graph_array):
         return omega + connectivity / self.nodes_count * \
                (self.graph_array * np.sin(np.outer(self.array_of_ones, null_theta)
                                           - np.outer(null_theta, self.array_of_ones))).dot(self.array_of_ones)
+    
+#endregion Models
 
+#region Handlers
 
-class DataLengthException(Exception):
-    def __init__(self, message: str):
-        self.__message = message
-
-    def raise_this(self):
-        raise self
-
-    def __repr__(self):
-        return self.__message
-
-
-# HANDLERS
 class JSONHandler:
     def __init__(self, data_matrix, names: tuple):
         self.matrix = data_matrix
         self.names = names
         self.response = defaultdict(dict)
 
-    def collect(self, frames: int):
+    def collect(self, frames):
         positions = [list(self.matrix[-object_index-1, :])[:frames] for object_index in range(self.names.__len__())]
         list(map(lambda index: self.response['objects'].__setitem__(self.names[index], positions[index]),
                  (index for index in range(self.names.__len__()))))
@@ -154,4 +138,4 @@ class KuramotoHandler:
                                 phases=self.phases, frequencies=self.frequencies).simulate()
         return self.handler(calculations, self.objects_names).collect(frames)
 
-
+#endregion Handlers
