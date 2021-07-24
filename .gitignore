@@ -1,2 +1,4 @@
-venv/
+.venv/
 .vscode/
+data/
+staticfiles/

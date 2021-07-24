@@ -1,0 +1,52 @@
+version: "3"
+
+services: 
+    django: 
+        container_name: ${CONTAINER_NAME_DJANGO}
+        build: 
+            context: .
+            dockerfile: Dockerfile
+            args:
+                PORT: ${DJANGO_PORT}
+        restart: always
+        environment: 
+            - DEBUG=${DJANGO_DEBUG}
+            - DATABASE_NAME=${PROJECT_POSTGRES_NAME}
+            - DATABASE_USER=${PROJECT_POSTGRES_USER}
+            - DATABASE_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
+            - DATABASE_PORT=${PROJECT_POSTGRES_PORT}
+            - REDIS_ADDRESS=${REDIS_ADDRESS}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_HOST=${CONTAINER_NAME_REDIS}
+
+        ports: 
+            - "${DJANGO_PORT}:${DJANGO_PORT}"
+        volumes: 
+            - .:/usr/src/app/
+        links:
+            - redis
+        depends_on: 
+            - redis
+            - postgres
+
+    postgres:
+        container_name: ${CONTAINER_NAME_POSTGRES}
+        restart: always
+        image: postgres
+        volumes: 
+            - ./data/database:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_DB=${PROJECT_POSTGRES_NAME}
+            - POSTGRES_USER=${PROJECT_POSTGRES_USER}
+            - POSTGRES_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
+            - POSTGRES_PORT=${PROJECT_POSTGRES_PORT}
+
+    redis:
+        container_name: ${CONTAINER_NAME_REDIS}
+        image: redis
+        command: "redis-server --port ${REDIS_PORT}"
+
+
+
+
+        

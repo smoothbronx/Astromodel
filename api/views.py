@@ -4,9 +4,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-from api.utils import validate
+from common.utils.decorators import validate
 from json import loads
-from api.utils import JSONHandler, KuramotoHandler
+from common.utils.handlers import JSONHandler, KuramotoHandler
 
 
 class IndexView(View):
@@ -33,7 +33,6 @@ class ApiTestView(View):
 
     @validate
     def post(self, request, **kwargs):
-        print(request.body)
         return JsonResponse(loads(request.body), json_dumps_params={'indent': 4})
 
 
