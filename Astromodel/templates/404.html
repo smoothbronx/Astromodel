@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" rel="stylesheet">
+        <title>Page not found</title>
+    </head>
+    <body>
+        <div class="content">
+            <button id="previous-page">
+                <i class="fas fa-arrow-left" id="icon"></i>
+            </button>
+            <div class="error-main">
+                <h1 class="glitch" id="error-code" data-text="404">404</h1>
+                <h2 class="message" id="error-message">You lost in bytes</h2>
+            </div>
+        </div>
+        <div class="scanlines"></div>
+    </body>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&display=swap);*{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;overflow:hidden;margin:0;padding:0}html{width:100vw;height:100vh}body{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background-color:#131313;font-family:'Fira Mono',monospace;color:#fff}#previous-page{width:100px;height:100px;background:0 0;border:4px solid #292929;border-radius:50%;transition:.3s;color:#292929;font-size:35px;overflow:none;margin:0 10px 0 0;display:flex;align-items:center;justify-content:center}#previous-page:hover{border-color:#fff;color:#fff}.content{display:flex;align-items:center;justify-content:center;flex-direction:row}.error-information{display:flex;align-items:center;flex-direction:column}.message{text-transform:uppercase;font-size:17px;font-weight:500}.glitch{z-index:-2;margin:0 auto;color:#fff;font-size:96px;font-weight:500;text-align:center;text-transform:uppercase;letter-spacing:.01em;line-height:.8;transform:scale3d(1,1,1)}.glitch::after,.glitch::before{content:attr(data-text);position:absolute;top:0;left:0;right:0;overflow:hidden;background:#131313;color:#fff;clip:rect(0,900px,0,0)}.glitch::before{left:7px;text-shadow:1px 0 green;animation:glitch-effect 4s infinite linear alternate-reverse}.glitch::after{left:3px;text-shadow:-1px 0 red;animation:glitch-effect 3s infinite linear alternate-reverse}.scanlines{z-index:-1;overflow:hidden;mix-blend-mode:difference}.scanlines::before{content:"";position:absolute;width:100%;height:100%;top:0;left:0;background:repeating-linear-gradient(to bottom,transparent 0,rgba(255,255,255,.02) .01%,transparent 1%);animation:fudge 7s ease-in-out alternate infinite}@keyframes fudge{from{transform:translate(0,0)}to{transform:translate(0,2%)}}@keyframes glitch-effect{0%{clip:rect(11px,9999px,69px,0)}6.7%{clip:rect(35px,9999px,49px,0)}13.3%{clip:rect(56px,9999px,36px,0)}20%{clip:rect(65px,9999px,61px,0)}26.7%{clip:rect(14px,9999px,5px,0)}33.3%{clip:rect(68px,9999px,17px,0)}40%{clip:rect(30px,9999px,34px,0)}46.7%{clip:rect(44px,9999px,23px,0)}53.3%{clip:rect(1px,9999px,27px,0)}60%{clip:rect(81px,9999px,72px,0)}66.7%{clip:rect(40px,9999px,15px,0)}73.3%{clip:rect(48px,9999px,91px,0)}80%{clip:rect(3px,9999px,22px,0)}86.7%{clip:rect(10px,9999px,34px,0)}93.3%{clip:rect(82px,9999px,65px,0)}100%{clip:rect(43px,9999px,40px,0)}}@media screen and (max-width:479px){.content{flex-direction:column-reverse}#previous-page{margin:10px 0 0 0}}
+    </style>
+    <script type="text/javascript">
+        document.getElementById('previous-page').onclick = () => {window.history.back()}
+    </script>
+</html>

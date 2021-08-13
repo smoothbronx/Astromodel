@@ -1,30 +1,31 @@
-version: "3"
+version: "3.8"
 
 services: 
     django: 
         container_name: ${CONTAINER_NAME_DJANGO}
-        build: 
-            context: .
+        build:
+            context: ./Astromodel/
             dockerfile: Dockerfile
-            args:
-                PORT: ${DJANGO_PORT}
+        command: daphne Astromodel.asgi:application --port ${DJANGO_PORT} --bind 0.0.0.0 -v2
+        volumes: 
+            - ./Astromodel/:/usr/src/app/
         restart: always
-        environment: 
+        environment:
             - DEBUG=${DJANGO_DEBUG}
             - DATABASE_NAME=${PROJECT_POSTGRES_NAME}
             - DATABASE_USER=${PROJECT_POSTGRES_USER}
             - DATABASE_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
             - DATABASE_PORT=${PROJECT_POSTGRES_PORT}
-            - REDIS_ADDRESS=${REDIS_ADDRESS}
-            - REDIS_PORT=${REDIS_PORT}
-            - REDIS_HOST=${CONTAINER_NAME_REDIS}
-
+            - REDIS_URL=${REDIS_URL}
+            - DJANGO_ADMIN_USERNAME=${DJANGO_ADMIN_USERNAME}
+            - DJANGO_ADMIN_EMAIL=${DJANGO_ADMIN_EMAIL}
+            - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
+            - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
         ports: 
             - "${DJANGO_PORT}:${DJANGO_PORT}"
-        volumes: 
-            - .:/usr/src/app/
         links:
             - redis
+            - postgres
         depends_on: 
             - redis
             - postgres
@@ -34,7 +35,7 @@ services:
         restart: always
         image: postgres
         volumes: 
-            - ./data/database:/var/lib/postgresql/data
+            - ./docker/postgres/db.data:/var/lib/postgresql/data
         environment:
             - POSTGRES_DB=${PROJECT_POSTGRES_NAME}
             - POSTGRES_USER=${PROJECT_POSTGRES_USER}

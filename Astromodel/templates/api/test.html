@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <button id="http_button">Send http</button>
+    <button id="ws_button">Send websocket</button>
+    <script>
+
+        let websocket = new WebSocket("ws://localhost:8000/kuramoto/");
+        let data = JSON.stringify({'time': 20, 'objects': {'65a3f9f3ed635': {'frequency': 2, 'connectivity': 2, 'start_angle': 0} , '35a3f9f3ed635': {'frequency': 5, 'connectivity': 9, 'start_angle': 0.1}}, 'fps': 60, 'debug': true})
+
+        websocket.onmessage = (event) => {
+            console.log(event)
+        }
+
+        $('#http_button').on('click', (click_event) => {
+            click_event.preventDefault()
+            $.ajax({
+                url: "{% url 'api:trade' %}",
+                method: "POST",
+                headers: {
+                    'access-token': "{{ token }}"
+                },
+                data: data,
+                async: true,
+                success: (response) => {
+                    console.log(response)
+                },
+                error: (response) => {
+                    console.log(response)
+                }
+            })
+        })
+
+        $("#ws_button").on("click", () => {
+            websocket.send(JSON.stringify({"event": "client.request", "debug": true, "token": "dDha03LqkyCYI6NyRZysPXukX","message": {"fps":60,"time":30,"objects":{"32ed5e4d18a4b":{"frequency":1,"connectivity":1,"start_angle":0},"b49ed54955ebc":{"frequency":6,"connectivity":1,"start_angle":1.5707963267948966},"15973127c9f26":{"frequency":2,"connectivity":5,"start_angle":3.141592653589793}}}}))
+        })
+    </script>
+</body>
+</html>
