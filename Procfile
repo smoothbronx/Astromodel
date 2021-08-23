@@ -1,0 +1,2 @@
+release: cd Astromodel/ && python manage.py makemigrations --no-input && python manage.py migrate --no-input && python manage.py collectstatic --no-input
+web: cd Astromodel/ && daphne djangoBasicTemplate.asgi:application --port $PORT --bind 0.0.0.0 -v2

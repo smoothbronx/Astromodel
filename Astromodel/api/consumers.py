@@ -3,9 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 from common.utils.handlers import KuramotoHandler, JSONHandler
 from .utils.responses import access_denied
-from channels.db import database_sync_to_async as async_db
-from api.models import Query
-
+from .utils.functions import createQuery
+from channels.db import database_sync_to_async
 
 class KuramotoConsumerBase:
     kuramoto = KuramotoHandler()
@@ -28,11 +27,8 @@ class KuramotoConsumer(AsyncWebsocketConsumer, KuramotoConsumerBase):
     async def receive(self, text_data):
         request = loads(text_data)
         response = await self.calculate(request.get("message"))
-        # await async_db(self.createQuery(request, response))
+        
+        await database_sync_to_async(createQuery)("websocket", request, response)
         await self.send(text_data=dumps({"message": response, "event": "server.response"})) \
             if self.validate(request.get("token"), request.get("event")) \
             else self.send(text_data=dumps(access_denied["asgi"]))
-    
-    # @async_db
-    # async def createQuery(request, response):
-    

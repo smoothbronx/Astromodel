@@ -4,10 +4,9 @@ from celery.schedules import crontab
 from django.utils.timezone import datetime
 
 
-environ.setdefault('DJANGO_SETTINGS_MODULE', 'Astromodel.settings')
+environ.setdefault("DJANGO_SETTINGS_MODULE", (lambda value: value if value is not None else "Astromodel.settings.development")(environ.get("DJANGO_SETTINGS_MODULE")))
 
-
-application = Celery("django.kuramoto")
+application = Celery("Astromodel")
 
 application.config_from_object("django.conf:settings", namespace="CELERY")
 

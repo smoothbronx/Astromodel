@@ -1,0 +1,26 @@
+{
+    "event": "client.request",
+    "debug": true,
+    "token": "dDha03LqkyCYI6NyRZysPXukX",
+    "message": {
+        "fps": 60,
+        "time": 30,
+        "objects": {
+            "32ed5e4d18a4b": {
+                "frequency": 1,
+                "connectivity": 1,
+                "start_angle": 0
+            },
+            "b49ed54955ebc": {
+                "frequency": 6,
+                "connectivity": 1,
+                "start_angle": 1.5707963267948966
+            },
+            "15973127c9f26": {
+                "frequency": 2,
+                "connectivity": 5,
+                "start_angle": 3.141592653589793
+            }
+        }
+    }
+}

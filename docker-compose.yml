@@ -12,23 +12,91 @@ services:
         restart: always
         environment:
             - DEBUG=${DJANGO_DEBUG}
+            - SECRET_KEY=${DJANGO_SECRET_KEY}
+            - API_TOKEN=${DJANGO_API_TOKEN}
+            - CELERY_APPLICATION_NAME=${CELERY_APPLICATION_NAME}
+
             - DATABASE_NAME=${PROJECT_POSTGRES_NAME}
             - DATABASE_USER=${PROJECT_POSTGRES_USER}
             - DATABASE_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
             - DATABASE_PORT=${PROJECT_POSTGRES_PORT}
+
             - REDIS_URL=${REDIS_URL}
+
             - DJANGO_ADMIN_USERNAME=${DJANGO_ADMIN_USERNAME}
             - DJANGO_ADMIN_EMAIL=${DJANGO_ADMIN_EMAIL}
             - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
             - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
         ports: 
             - "${DJANGO_PORT}:${DJANGO_PORT}"
-        links:
-            - redis
-            - postgres
+        networks: 
+            - backend
         depends_on: 
             - redis
             - postgres
+        
+    celery-beat:
+        container_name: ${CONTAINER_NAME_CELERY}
+        build:
+            context: ./Astromodel/
+            dockerfile: Dockerfile
+        command: celery -A "${CELERY_APPLICATION_NAME}" beat
+        volumes: 
+            - ./Astromodel/:/usr/src/app/
+        restart: always
+        environment:
+            - DEBUG=${DJANGO_DEBUG}
+            - SECRET_KEY=${DJANGO_SECRET_KEY}
+            - API_TOKEN=${DJANGO_API_TOKEN}
+            - CELERY_APPLICATION_NAME=${CELERY_APPLICATION_NAME}
+
+            - DATABASE_NAME=${PROJECT_POSTGRES_NAME}
+            - DATABASE_USER=${PROJECT_POSTGRES_USER}
+            - DATABASE_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
+            - DATABASE_PORT=${PROJECT_POSTGRES_PORT}
+
+            - REDIS_URL=${REDIS_URL}
+
+            - DJANGO_ADMIN_USERNAME=${DJANGO_ADMIN_USERNAME}
+            - DJANGO_ADMIN_EMAIL=${DJANGO_ADMIN_EMAIL}
+            - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
+            - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+        networks: 
+            - backend
+        depends_on: 
+            - django
+        
+    celery:
+        container_name: ${CONTAINER_NAME_CELERY_BEAT}
+        build: 
+            context: ./Astromodel/
+            dockerfile: Dockerfile
+        command: celery -A "${CELERY_APPLICATION_NAME}" worker -l ${CELERY_LOGGING_LEVEL} --pool=solo
+        volumes: 
+            - ./Astromodel/:/usr/src/app/
+        restart: always
+        environment:
+            - DEBUG=${DJANGO_DEBUG}
+            - SECRET_KEY=${DJANGO_SECRET_KEY}
+            - API_TOKEN=${DJANGO_API_TOKEN}
+            - CELERY_APPLICATION_NAME=${CELERY_APPLICATION_NAME}
+
+            - DATABASE_NAME=${PROJECT_POSTGRES_NAME}
+            - DATABASE_USER=${PROJECT_POSTGRES_USER}
+            - DATABASE_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
+            - DATABASE_PORT=${PROJECT_POSTGRES_PORT}
+
+            - REDIS_URL=${REDIS_URL}
+
+            - DJANGO_ADMIN_USERNAME=${DJANGO_ADMIN_USERNAME}
+            - DJANGO_ADMIN_EMAIL=${DJANGO_ADMIN_EMAIL}
+            - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD}
+            - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+        networks: 
+            - backend
+        depends_on: 
+            - celery-beat
+
 
     postgres:
         container_name: ${CONTAINER_NAME_POSTGRES}
@@ -41,11 +109,18 @@ services:
             - POSTGRES_USER=${PROJECT_POSTGRES_USER}
             - POSTGRES_PASSWORD=${PROJECT_POSTGRES_PASSWORD}
             - POSTGRES_PORT=${PROJECT_POSTGRES_PORT}
+        networks: 
+            - backend
 
     redis:
         container_name: ${CONTAINER_NAME_REDIS}
         image: redis
         command: "redis-server --port ${REDIS_PORT}"
+        networks: 
+            - backend
+
+networks: 
+    backend:
 
 
 

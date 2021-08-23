@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from .utils.decorators import validate
+from .utils.functions import createQuery
 from common.utils.handlers import JSONHandler, KuramotoHandler
 
 from json import dumps, loads
@@ -28,17 +29,9 @@ class TradeView(View):
     def post(self, request, **kwargs):
         request = loads(request.body)
         response = KuramotoHandler(request).setHandler(JSONHandler).build()
-        Query(protocol="http", debug=request.get("debug", False), **self.transform_data(request=request, response=response)).save()
+        
+        createQuery("http", request, response)
         return JsonResponse(response, json_dumps_params={'indent': 4})
-    
-    def transform_data(self, **kwargs) -> dict:
-        d = dict(map(lambda items: (items[0], self.generate_file(items[0], items[1])), kwargs.items()))
-        print(d)
-        return d
-    
-    @staticmethod
-    def generate_file(filename: str, content: dict, extension: str = ".json") -> ContentFile:
-        return ContentFile(name=filename+extension, content=dumps(content, indent=4))
 
 
 @method_decorator(csrf_exempt, name='dispatch')
